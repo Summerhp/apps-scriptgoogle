@@ -1,0 +1,67 @@
+var SS = SpreadsheetApp.getActiveSpreadsheet();
+var sheet = SS.getSheetByName('Myreport')
+
+function onOpen(){
+
+var ui= SpreadsheetApp.getUi();
+
+ui.createMenu('Youtube')
+.addItem('Generar Reporte','myReport')
+.addToUi();
+
+}
+
+function myReport(){
+
+  //Acceder al canal y obtener la lista de los videos subidos
+  var channel= YouTube.Channels.list('contentDetails,statistics',{id:'UC4sY2EC2d9rgAeGSw7iwjbg'});
+
+  //console.log(channel);
+  var item= channel.items[0];
+  //console.log(item)
+
+  var playlistId = item.contentDetails.relatedPlaylists.uploads;
+
+  //console.log(playlistId)
+
+  var nextPageToken = '';
+
+  var videoData = [];
+
+  do{
+    var playlist= YouTube.PlaylistItems.list('snippet,contentDetails',{ playlistId: playlistId, pageToken: nextPageToken })
+
+    //console.log(playlist)
+    
+    playlist.items.forEach(item =>{
+      
+      //console.log(item);
+      var videoId=item.contentDetails.videoId;
+      var title=  item.snippet.title;
+      var publishDate = new Date(item.contentDetails.videoPublishedAt);
+      
+      var videoStatics = YouTube.Videos.list('statistics',{id : videoId}).items[0].statistics;
+
+      var videoviews = videoStatics.viewCount;
+      var videolikes = videoStatics.likeCount;
+      var videoComments = videoStatics.commentCount;
+      
+      //console.log(videoId);
+      //console.log(title);
+      //console.log(publishDate);
+      //console.log(videoviews);
+      //console.log(videolikes);
+      //console.log(videoComments);
+
+      videoData.push([ videoId,title,publishDate,videoviews,videolikes,videoComments ]);
+    })
+    
+    nextPageToken = playlist.nextPageToken;
+
+  }while(nextPageToken!=null)
+
+  //console.log(videoData);
+
+  sheet.getRange(2,1,videoData.length,videoData[0].length).setValues(videoData);
+
+}
