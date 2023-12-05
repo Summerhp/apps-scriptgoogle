@@ -1,0 +1,28 @@
+function onOpen() {
+  var ui = SpreadsheetApp.getUi()
+  ui.createMenu('Correos')
+    .addItem('Traer Correos de la Etiqueta', 'menuItem1')
+    .addToUi()
+}
+
+function menuItem1() {
+  traerCorreos();
+}
+
+function traerCorreos() {
+  const hoja = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet()
+  const nombreEtiqueta = hoja.getRange('B1').getValue()
+  const etiqueta = GmailApp.getUserLabelByName(nombreEtiqueta)
+  const cadenas = etiqueta.getThreads()
+  //hoja.getRange(4, 1, hoja.getLastRow() - 3, hoja.getLastColumn()).clearContent()
+  Logger.log(cadenas)
+
+  cadenas.forEach(cadena => {
+    const asunto = cadena.getFirstMessageSubject()
+    const correo = cadena.getMessages()[0]
+    const cuerpo = correo.getPlainBody()
+    const remitente = correo.getFrom()
+    const fecha = correo.getDate()
+    hoja.appendRow([remitente, asunto, cuerpo, fecha])
+  })
+}
