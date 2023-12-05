@@ -1,0 +1,61 @@
+function enviarPresentacion() {
+  var libro = SpreadsheetApp.getActiveSpreadsheet();
+  var hoja = libro.getSheetByName("Notas")
+  var datos = hoja.getDataRange().getDisplayValues();
+  datos.shift();
+  var i = 0;
+  datos.forEach(fila =>{
+    
+    var fila = datos[i]
+    console.log(fila)
+  var email = fila[0];
+  var nombre = fila[1];
+  var pp = fila[2];
+  var sp = fila[3];
+  var tp = fila[4];
+  var ef = fila[5];
+  var def = fila[6];
+  var mensaje = fila[7];
+  
+  var presentacion = SlidesApp.openById("1C8ADWRncqngb2nMwPw2MdfHA-rEQ7txqreJaZumzOoo");
+  presentacion.replaceAllText("{{nombre}}",nombre);
+  presentacion.replaceAllText("{{mensaje}}",mensaje);
+  presentacion.replaceAllText("{{pp}}",pp);
+  presentacion.replaceAllText("{{sp}}",sp);
+  presentacion.replaceAllText("{{tp}}",tp);
+  presentacion.replaceAllText("{{ef}}",ef);
+  presentacion.replaceAllText("{{def}}",def);
+  presentacion.saveAndClose();
+
+  var archivoPresentacion = DriveApp.getFileById("1C8ADWRncqngb2nMwPw2MdfHA-rEQ7txqreJaZumzOoo");
+  var pdf = archivoPresentacion.getAs("application/pdf").setName("Presentación de " + nombre)
+  GmailApp.sendEmail(email, "Reporte de notas", "Buen día, en el siguiente PDF se adjuntará el reporte de notas", {
+    attachments:[pdf]
+  })
+
+  regresar(nombre, mensaje, pp, sp, tp, ef, def);
+  i++;
+  })
+
+  
+}
+
+function regresar(nombre, mensaje, pp, sp, tp, ef, def){
+  var presentacion = SlidesApp.openById("1C8ADWRncqngb2nMwPw2MdfHA-rEQ7txqreJaZumzOoo");
+  presentacion.replaceAllText(nombre, "{{nombre}}");
+  presentacion.replaceAllText(mensaje, "{{mensaje}}");
+  presentacion.replaceAllText("Primer previo: " + pp, "Primer previo: {{pp}}");
+  presentacion.replaceAllText("Segundo previo: " + sp, "Segundo previo: {{sp}}");
+  presentacion.replaceAllText("Tercer previo: " + tp, "Tercer previo: {{tp}}");
+  presentacion.replaceAllText("Examen final: " + ef, "Examen final: {{ef}}");
+  presentacion.replaceAllText("DEFINITIVA: " +def, "DEFINITIVA: {{def}}");
+  presentacion.saveAndClose();
+  var archivoPresentacion = DriveApp.getFileById("1C8ADWRncqngb2nMwPw2MdfHA-rEQ7txqreJaZumzOoo");
+  var pdf = archivoPresentacion.getAs("application/pdf").setName("Plantilla")
+}
+
+function onOpen(){
+  var menu = SpreadsheetApp.getUi().createMenu("Generar reportes");
+  menu.addItem("Generar todos los reportes", "enviarPresentacion")
+  .addToUi();
+}
