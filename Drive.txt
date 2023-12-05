@@ -1,0 +1,35 @@
+const COL_ID = 2
+const COL_CONTADOR = 3
+
+function onOpen() {
+  var ui = SpreadsheetApp.getUi()
+  ui.createMenu('Hacer algo COOL')
+    .addItem('Contar Archivos', 'menuItem1')
+    .addToUi()
+}
+
+function menuItem1() {
+  contarArchivosTabla();
+}
+
+function contarArchivosTabla() {
+  var hoja = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet()
+  for (var i = 2; i <= hoja.getLastRow(); i++) {
+    var idCarpeta = hoja.getRange(i, COL_ID).getValue()
+    var cont = contarArchivos(idCarpeta)
+    hoja.getRange(i, COL_CONTADOR).setValue(cont)
+  }
+
+}
+
+function contarArchivos(id) {
+  var carpeta = DriveApp.getFolderById(id)
+  var iterador = carpeta.getFiles()
+  var contador = 0
+  while (iterador.hasNext()) {
+    iterador.next()
+    contador++
+  }
+  return contador
+
+}
