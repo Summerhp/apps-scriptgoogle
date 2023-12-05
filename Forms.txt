@@ -1,0 +1,100 @@
+function TraerPreguntas() {
+	const formulario = FormApp.openByUrl("link del google form") //Extrae el formulario
+	const preguntas = formulario.getItems() //Obtiene el arreglo de las preguntas
+	preguntas.forEach(pregunta => { //Código para poder tener el id de cada pregunta
+		Logger.log(pregunta.getTitle()) //Devuelve el nombre de la pregunta
+		Logger.log(pregunta.getId().toString()) //Devuelve el id de la pregunta
+	})
+}
+
+function actualizarPreguntas() {
+	crearPreguntasMaterias(); 
+	crearPreguntasFechas();
+	crearPreguntasHoras();
+}
+
+function crearPreguntasMaterias() {
+	const libro = SpreadsheetApp.getActiveSpreadsheet();
+	const hoja = libro.getSheetByName("Disponibilidad")
+	//Creo un arreglo de materias 
+	const arregloMaterias = hoja.getRange(2, 1, hoja.getLastRow() - 1).getValues()
+
+	//Como la info que me da es un arreglo de arreglos, lo convierto en un arreglo de las materias
+	const opcionesMateria = arregloMaterias.map(fila => fila[0])
+
+	//Linkeo la pregunta al form
+	const formulario = FormApp.openByUrl("https://docs.google.com/forms/d/1Dz_-bKCGaSSKVLfJX44RpZgAQWU6Ouoa7iWX8IVmDmg/edit")
+	const preguntaMateria = formulario.getItemById("1291841389")
+
+	if (opcionesMateria.indexOf("") != -1) {
+		//Creo un arreglo por si alguna información sale nula, para evitar que los datos que se agreguen al forms, sea alguna opción vacía
+		var arregloMateriasSinNull = [];
+		for (var i = 0; i < opcionesMateria.indexOf(""); i++) {
+			arregloMateriasSinNull.push(opcionesMateria[i])
+		}
+		preguntaMateria.asMultipleChoiceItem().setChoiceValues(arregloMateriasSinNull)
+	} else {
+		preguntaMateria.asMultipleChoiceItem().setChoiceValues(arregloMaterias)
+	}
+
+
+}
+
+function crearPreguntasFechas() {
+	const libro = SpreadsheetApp.getActiveSpreadsheet();
+	const hoja = libro.getSheetByName("Disponibilidad")
+	//Creo un arreglo de fechas 
+	const arregloFechas = hoja.getRange(2, 2, hoja.getLastRow() - 1).getDisplayValues()
+
+	//Como la info que me da es un arreglo de arreglos, lo convierto en un arreglo de las fechas
+	const opcionesFechas = arregloFechas.map(fila => fila[0])
+
+	//Linkeo a las preguntas
+	const formulario = FormApp.openByUrl("https://docs.google.com/forms/d/1Dz_-bKCGaSSKVLfJX44RpZgAQWU6Ouoa7iWX8IVmDmg/edit")
+	const preguntaFecha = formulario.getItemById("1103040774")
+
+	if (opcionesFechas.indexOf("") != -1) {
+		//Creo un arreglo por si alguna información sale nula, para evitar que los datos que se agreguen al forms, sea alguna opción vacía
+		var arregloFechasSinNull = [];
+		for (var i = 0; i < opcionesFechas.indexOf(""); i++) {
+			arregloFechasSinNull.push(opcionesFechas[i])
+		}
+		preguntaFecha.asListItem().setChoiceValues(arregloFechasSinNull)
+	} else {
+		preguntaFecha.asListItem().setChoiceValues(arregloFechas)
+	}
+}
+
+function crearPreguntasHoras() {
+	const libro = SpreadsheetApp.getActiveSpreadsheet();
+	const hoja = libro.getSheetByName("Disponibilidad")
+	//Creo un arreglo de horas 
+	const arregloHoras = hoja.getRange(2, 3, hoja.getLastRow() - 1).getDisplayValues()
+	console.log(arregloHoras);
+	//Como la info que me da es un arreglo de arreglos, lo convierto en un arreglo de las horas
+	const opcionesHoras = arregloHoras.map(fila => fila[0])
+	console.log(opcionesHoras)
+
+	//Conectar al form de la pregunta
+	const formulario = FormApp.openByUrl("https://docs.google.com/forms/d/1Dz_-bKCGaSSKVLfJX44RpZgAQWU6Ouoa7iWX8IVmDmg/edit")
+	const preguntaHora = formulario.getItemById("743223634")
+	//Creo un arreglo por si alguna información sale nula, para evitar que los datos que se agreguen al forms, sea alguna opción vacía
+	if (opcionesHoras.indexOf("") != -1) {
+		var arregloHorasSinNull = [];
+		for (var i = 0; i < opcionesHoras.indexOf(""); i++) {
+			arregloHorasSinNull.push(opcionesHoras[i])
+			console.log(arregloHorasSinNull);
+		}
+		preguntaHora.asListItem().setChoiceValues(arregloHorasSinNull)
+	} else {
+		preguntaHora.asListItem().setChoiceValues(arregloHoras)
+	}
+
+}
+
+/* 21:54:35	Información	¿Para qué materias quieres asesoría?
+21:54:35	Información	1291841389
+21:54:35	Información	¿Qué día?
+21:54:35	Información	1103040774
+21:54:35	Información	¿A qué hora?
+21:54:35	Información	743223634 */
