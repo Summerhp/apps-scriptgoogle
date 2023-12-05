@@ -1,0 +1,45 @@
+function onOpen(){
+  SpreadsheetApp.getUi()
+  .createMenu('Calendar')
+  .addItem('Crear eventos', 'crearEventos')
+  .addToUi();
+}
+
+function crearEventos(){
+
+  var sheetEventos = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Eventos');
+  var [header,...data] = sheetEventos.getDataRange().getValues();
+
+  const TITULO = header.indexOf('Título');
+  const DESCRIPCION = header.indexOf('Descripción');
+  const INICIO = header.indexOf('Hora Inicio');
+  const FIN = header.indexOf('Hora Finalización');
+  const ENVIAR_INVITACIONES = header.indexOf('Enviar invitaciones');
+  const INVITADOS = header.indexOf('Invitados');
+  const EVENTO_CREADO = header.indexOf('Evento creado');
+
+  var options = {
+    description: '',
+    sendInvites: '',
+    guests: ''
+  }
+
+  data.forEach(function(row, index){
+
+    if(row[TITULO] && row[EVENTO_CREADO] == false ){
+      
+      var titulo = row[TITULO];
+      var horaInicio = row[INICIO];
+      var horaFin = row[FIN];
+
+      options.description = row[DESCRIPCION];
+      options.sendInvites = row[ENVIAR_INVITACIONES];
+      options.guests = row[INVITADOS];
+
+      CalendarApp.getDefaultCalendar().createEvent(titulo,horaInicio,horaFin,options);
+
+      sheetEventos.getRange( index + 2, EVENTO_CREADO+1).setValue(true);
+    }
+
+  });
+}
